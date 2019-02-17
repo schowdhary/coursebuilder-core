@@ -22,6 +22,8 @@ env_variables:
   GCB_PRELOADED_MODULES:
     modules.help_urls.help_urls
     modules.dashboard.dashboard
+  GCB_REGISTERED_MODULES_CUSTOM:
+    modules.labels.labels
 
 includes:
 - custom.yaml

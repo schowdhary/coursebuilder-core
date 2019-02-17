@@ -1,0 +1,9 @@
+registration:
+  main_module: modules.labels.labels
+
+files:
+  - modules/labels/__init__.py
+  - modules/labels/labels.py
+  - modules/labels/templates/labels_list.html
+  - modules/labels/manifest.yaml
+  - modules/labels/messages.py
