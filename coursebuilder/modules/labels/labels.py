@@ -55,7 +55,7 @@ TEMPLATE_DIR = os.path.join(
     appengine_config.BUNDLE_ROOT, 'modules', MODULE_NAME, 'templates')
 
 
-class LabelEntity(entities.BaseEntity):
+class CourseLabelEntity(entities.BaseEntity):
     """A class representing labels that can be applied to Course."""
     title = db.StringProperty(indexed=False)
     data = db.TextProperty(indexed=False)
@@ -72,7 +72,7 @@ class LabelEntity(entities.BaseEntity):
           Value of entity as modified by put() (i.e., key setting)
         """
 
-        result = super(LabelEntity, self).put()
+        result = super(CourseLabelEntity, self).put()
         models.MemcacheManager.delete(self.MEMCACHE_KEY)
         return result
 
@@ -83,7 +83,7 @@ class LabelEntity(entities.BaseEntity):
         the cache on any change to any label.
         """
 
-        super(LabelEntity, self).delete()
+        super(CourseLabelEntity, self).delete()
         models.MemcacheManager.delete(self.MEMCACHE_KEY)
 
     @classmethod
@@ -94,23 +94,21 @@ class LabelEntity(entities.BaseEntity):
         return entity
 
     @classmethod
-    def get_labels(cls, locale=None):
-        memcache_key = cls._cache_key(locale)
-        items = models.MemcacheManager.get(memcache_key)
+    def get_labels(cls):
+        memcache_key = cls._cache_key()
+        items = models.MemcacheManager.get(cls.MEMCACHE_KEY)
         if items is None:
-            items = list(common_utils.iter_all(LabelEntity.all()))
+            items = list(common_utils.iter_all(CourseLabelEntity.all()))
 
             # TODO(psimakov): prepare to exceed 1MB max item size
             # read more here: http://stackoverflow.com
             #   /questions/5081502/memcache-1-mb-limit-in-google-app-engine
-            models.MemcacheManager.set(memcache_key, items)
+            models.MemcacheManager.set(cls.MEMCACHE_KEY, items)
         return items
 
     @classmethod
-    def _cache_key(cls, locale=None):
-        if not locale:
-            return cls.MEMCACHE_KEY
-        return cls.MEMCACHE_KEY + ':' + locale
+    def _cache_key(cls):
+        return cls.MEMCACHE_KEY
 
 
 
@@ -175,7 +173,7 @@ class LabelsDashboardHandler(
 
     def get_list_course_labels(self):
         """Shows a list of labels."""
-        items = LabelEntity.get_labels()
+        items = CourseLabelEntity.get_labels()
 
         main_content = self.get_template(
             'labels_list.html', [TEMPLATE_DIR]).render({
@@ -190,7 +188,7 @@ class LabelsDashboardHandler(
 
     def post_add_course_label(self):
         """Adds a new label and redirects to an editor for it."""
-        entity = LabelEntity.make(self.DEFAULT_TITLE_TEXT, '')
+        entity = CourseLabelEntity.make(self.DEFAULT_TITLE_TEXT, '')
         entity.put()
 
         self.redirect(self.get_label_action_url(
@@ -226,7 +224,7 @@ class LabelsDashboardHandler(
     def post_delete_course_label(self):
         """Deletes an label."""
         key = self.request.get('key')
-        entity = LabelEntity.get(key)
+        entity = CourseLabelEntity.get(key)
         if entity:
             entity.delete()
         self.redirect('/{}'.format(self.LIST_URL))
@@ -262,7 +260,7 @@ class LabelsItemRESTHandler(utils.BaseRESTHandler):
         key = self.request.get('key')
 
         try:
-            entity = LabelEntity.get(key)
+            entity = CourseLabelEntity.get(key)
         except db.BadKeyError:
             entity = None
 
@@ -291,7 +289,7 @@ class LabelsItemRESTHandler(utils.BaseRESTHandler):
                 request, self.ACTION, {'key': key}):
             return
 
-        entity = LabelEntity.get(key)
+        entity = CourseLabelEntity.get(key)
         if not entity:
             transforms.send_json_response(
                 self, 404, 'Object not found.', {'key': key})
@@ -318,7 +316,7 @@ class LabelsItemRESTHandler(utils.BaseRESTHandler):
                 self.request, 'label-delete', {'key': key}):
             return
 
-        entity = LabelEntity.get(key)
+        entity = CourseLabelEntity.get(key)
         if not entity:
             transforms.send_json_response(
                 self, 404, 'Object not found.', {'key': key})
