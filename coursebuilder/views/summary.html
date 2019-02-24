@@ -14,7 +14,7 @@
   <link href="/modules/skill_map/_static/css/common.css" rel="stylesheet" type="text/css">
   <ol class="skill-display-root">
   {% for label in course_labels %}
-    <li class="skill">{{label.title}}: {{label.description}}</li>
+    <li class="skill">{{label.title}} {% if label.description %}: {{label.description}}{% endif %}</li>
   {% endfor %}
   </ol>
   </p>
