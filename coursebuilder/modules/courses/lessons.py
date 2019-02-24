@@ -37,6 +37,7 @@ from models import student_work
 from models import transforms
 from modules.assessments import assessments
 from modules.courses import unit_outline
+from modules.labels import labels
 from modules.review import domain
 from tools import verify
 
@@ -213,6 +214,9 @@ class CourseHandler(utils.BaseHandler):
         self.template_value['navbar'] = {'course': True}
         student_view = unit_outline.StudentCourseView(course, student)
         self.template_value['course_outline'] = student_view.contents
+        #Shikha
+        course_labels = labels.CourseLabelEntity.get_labels()
+        self.template_value['course_labels'] = course_labels
         self.template_value['course_availability'] = course_availability
         self.template_value['show_lessons_in_syllabus'] = (
             settings['course'].get('show_lessons_in_syllabus', False))

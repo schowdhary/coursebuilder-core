@@ -8,6 +8,18 @@
     {{course_info.course.title}}
   </h1>
 
+  <!--Shikha-->
+  {% if course_labels %}
+  <p class="gcb-product-headers">
+  <link href="/modules/skill_map/_static/css/common.css" rel="stylesheet" type="text/css">
+  <ol class="skill-display-root">
+  {% for label in course_labels %}
+    <li class="skill">{{label.title}}: {{label.description}}</li>
+  {% endfor %}
+  </ol>
+  </p>
+  {% endif %}
+
   <p class="gcb-product-headers">
   {{course_info.course.blurb | gcb_tags}}
   </p>

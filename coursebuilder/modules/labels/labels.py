@@ -58,7 +58,7 @@ TEMPLATE_DIR = os.path.join(
 class CourseLabelEntity(entities.BaseEntity):
     """A class representing labels that can be applied to Course."""
     title = db.StringProperty(indexed=False)
-    data = db.TextProperty(indexed=False)
+    description = db.TextProperty(indexed=False)
 
     MEMCACHE_KEY = 'course_labels'
 
@@ -87,10 +87,10 @@ class CourseLabelEntity(entities.BaseEntity):
         models.MemcacheManager.delete(self.MEMCACHE_KEY)
 
     @classmethod
-    def make(cls, title, data):
+    def make(cls, title, description):
         entity = cls()
         entity.title = title
-        entity.data = data
+        entity.description = description
         return entity
 
     @classmethod
@@ -247,7 +247,7 @@ class LabelsItemRESTHandler(utils.BaseRESTHandler):
             'title', 'Title', 'string',
             description=messages.LABEL_TITLE))
         schema.add_property(schema_fields.SchemaField(
-            'html', 'Description', 'string',
+            'description', 'Description', 'string',
             description=messages.LABEL_DESCRIPTION,
             extra_schema_dict_values={
                 'supportCustomTags': tags.CAN_USE_DYNAMIC_TAGS.value,
